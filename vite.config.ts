@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
-// '/' for the custom domain (draw.sabrlabs.co.uk). The deploy workflow passes the path GitHub
+// '/' for the custom domain (draw.ammaarm.com). The deploy workflow passes the path GitHub
 // Pages reports, so the same build also works at <user>.github.io/<repo>/ before the domain is set.
 const base = `${(process.env.BASE_PATH ?? '').replace(/\/+$/, '')}/`;
 

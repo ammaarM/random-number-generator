@@ -4,8 +4,7 @@ A mobile-first random number generator for game night: board games, tabletop ses
 games, raffles and picking turn order. Set up how numbers are generated, then tap one big button
 as often as you like.
 
-Live at **https://ammaarm.github.io/random-number-generator/** (moving to
-https://draw.sabrlabs.co.uk). Installable, works offline, no backend, no analytics.
+Live at **https://draw.ammaarm.com**. Installable, works offline, no backend, no analytics.
 
 ## Features
 
@@ -81,10 +80,10 @@ routing is added later.
 One-off manual steps:
 
 1. **Repo Settings → Pages → Source:** choose **GitHub Actions**.
-2. **Cloudflare DNS for `sabrlabs.co.uk`:** add a `CNAME` record with name `draw` and target
+2. **Cloudflare DNS for `ammaarm.com`:** add a `CNAME` record with name `draw` and target
    `<github-username>.github.io`. Set it to **DNS only (grey cloud)** until GitHub issues the
    certificate.
-3. **Repo Settings → Pages → Custom domain:** enter `draw.sabrlabs.co.uk`, wait for the DNS check
+3. **Repo Settings → Pages → Custom domain:** enter `draw.ammaarm.com`, wait for the DNS check
    to pass, then tick **Enforce HTTPS**.
 4. **Optional:** switch the record to **Proxied (orange cloud)** afterwards, with Cloudflare
    SSL/TLS mode set to **Full**.
