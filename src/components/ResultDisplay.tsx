@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useRef, useState, type MouseEvent } from 'react';
 import { useCopy } from '../hooks/useCopy';
 import { useRoll } from '../hooks/useRoll';
 import {
@@ -19,6 +19,8 @@ const ROLL_MS = 420;
 const STAGGER_BUDGET_MS = 380;
 /** Beyond this many tiles the ticking is skipped in favour of a quick stagger. */
 const MAX_ROLLING_TILES = 30;
+/** Two taps closer together than this count as a double-tap. */
+const DOUBLE_TAP_MS = 350;
 
 const settle = { scale: [1, 1.14, 1] };
 const settleTransition = { duration: 0.32, ease: 'easeOut' as const };
@@ -74,7 +76,6 @@ function Rolling({ final, sample, duration, onSettle }: RollingProps) {
 }
 
 function ListResult({ result }: { result: DrawResult }) {
-  const copy = useCopy();
   const { config, values } = result;
   const labels = values.map((v) => formatValue(v, config));
   const longest = Math.max(...labels.map((l) => l.length));
@@ -85,63 +86,38 @@ function ListResult({ result }: { result: DrawResult }) {
 
   if (values.length === 1) {
     return (
-      <button
-        type="button"
-        onClick={() => copy(labels[0])}
-        aria-label={`Copy ${labels[0]}`}
-        className={`rounded-3xl px-4 font-black tabular-nums leading-none tracking-tight ${bigTextSize(longest)}`}
+      <p
+        className={`px-4 font-black tabular-nums leading-none tracking-tight ${bigTextSize(longest)}`}
       >
         <Rolling final={labels[0]} sample={sample} duration={ROLL_MS} onSettle={onLastSettle} />
-      </button>
+      </p>
     );
   }
 
   const size = tileSize(values.length, longest);
   return (
-    <div className="flex flex-col items-center gap-4">
-      <ul className="flex flex-wrap justify-center gap-2.5">
-        {labels.map((label, i) => (
-          <motion.li
-            key={i}
-            initial={{ opacity: 0, y: 14, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{
-              delay: (i * stagger) / 1000,
-              type: 'spring',
-              stiffness: 420,
-              damping: 26,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => copy(label)}
-              aria-label={`Copy ${label}`}
-              className={`grid min-h-11 place-items-center border border-border bg-surface font-extrabold tabular-nums leading-none shadow-card ${size.tile} ${size.text} ${usesCoinLabels(config) ? '' : 'tracking-tight'}`}
-            >
-              <Rolling
-                final={label}
-                sample={sample}
-                duration={rolling ? ROLL_MS + i * stagger : 0}
-                onSettle={i === values.length - 1 ? onLastSettle : undefined}
-              />
-            </button>
-          </motion.li>
-        ))}
-      </ul>
-      <button
-        type="button"
-        onClick={() => copy(resultText(result))}
-        className="flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold text-accent-text"
-      >
-        <CopyIcon width={18} height={18} />
-        Copy all
-      </button>
-    </div>
+    <ul className="flex flex-wrap justify-center gap-2.5">
+      {labels.map((label, i) => (
+        <motion.li
+          key={i}
+          initial={{ opacity: 0, y: 14, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: (i * stagger) / 1000, type: 'spring', stiffness: 420, damping: 26 }}
+          className={`grid min-h-11 place-items-center border border-border bg-surface font-extrabold tabular-nums leading-none shadow-card ${size.tile} ${size.text} ${usesCoinLabels(config) ? '' : 'tracking-tight'}`}
+        >
+          <Rolling
+            final={label}
+            sample={sample}
+            duration={rolling ? ROLL_MS + i * stagger : 0}
+            onSettle={i === values.length - 1 ? onLastSettle : undefined}
+          />
+        </motion.li>
+      ))}
+    </ul>
   );
 }
 
 function SumResult({ result }: { result: DrawResult }) {
-  const copy = useCopy();
   const [settled, setSettled] = useState(false);
   const { config, values } = result;
   const total = resultText(result);
@@ -154,11 +130,8 @@ function SumResult({ result }: { result: DrawResult }) {
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="text-sm font-bold uppercase tracking-[0.2em] text-muted">Total</p>
-      <button
-        type="button"
-        onClick={() => copy(total)}
-        aria-label={`Copy total ${total}`}
-        className={`rounded-3xl px-4 font-black tabular-nums leading-none tracking-tight ${bigTextSize(widest)}`}
+      <p
+        className={`px-4 font-black tabular-nums leading-none tracking-tight ${bigTextSize(widest)}`}
       >
         <Rolling
           final={total}
@@ -169,7 +142,7 @@ function SumResult({ result }: { result: DrawResult }) {
             vibrate(18);
           }}
         />
-      </button>
+      </p>
       <motion.p
         initial={false}
         animate={{ opacity: settled ? 1 : 0, y: settled ? 0 : 6 }}
@@ -182,17 +155,13 @@ function SumResult({ result }: { result: DrawResult }) {
 }
 
 function JoinedResult({ result }: { result: DrawResult }) {
-  const copy = useCopy();
   const { config } = result;
   const joined = resultText(result);
   const sample = () => randomInts(config.min, config.max, config.count).join('');
 
   return (
-    <button
-      type="button"
-      onClick={() => copy(joined)}
-      aria-label={`Copy ${joined}`}
-      className={`max-w-full break-all rounded-3xl px-2 font-black tabular-nums leading-tight tracking-tight ${bigTextSize(joined.length)}`}
+    <p
+      className={`max-w-full break-all px-2 text-center font-black tabular-nums leading-tight tracking-tight ${bigTextSize(joined.length)}`}
     >
       <Rolling
         final={joined}
@@ -200,7 +169,7 @@ function JoinedResult({ result }: { result: DrawResult }) {
         duration={ROLL_MS + 120}
         onSettle={() => vibrate(18)}
       />
-    </button>
+    </p>
   );
 }
 
@@ -226,22 +195,62 @@ function Result({ result }: { result: DrawResult }) {
   }
 }
 
+/** Small corner badge that copies the whole result. */
+function CopyBadge({ result }: { result: DrawResult }) {
+  const copy = useCopy();
+  const text = resultText(result);
+  return (
+    <button
+      type="button"
+      onClick={(event) => {
+        // Keep badge taps out of the double-tap-to-draw detection.
+        event.stopPropagation();
+        copy(text);
+      }}
+      aria-label={`Copy ${text}`}
+      className="group absolute right-[max(0.5rem,env(safe-area-inset-right))] top-0 z-10 grid h-11 w-11 place-items-center rounded-full"
+    >
+      <span className="grid h-8 w-8 place-items-center rounded-full border border-border bg-surface text-muted shadow-card transition-colors group-hover:text-text">
+        <CopyIcon width={15} height={15} />
+      </span>
+    </button>
+  );
+}
+
 export function ResultDisplay() {
   const result = useStore((s) => s.result);
   const drawCount = useStore((s) => s.drawCount);
+  const draw = useStore((s) => s.draw);
+  const lastTap = useRef(0);
   // A trailing no-break space on alternate draws makes identical results re-announce.
   const announcement = result ? announceResult(result) + (drawCount % 2 ? ' ' : '') : '';
 
+  // Timed by hand rather than with `dblclick`, which touch browsers fire inconsistently.
+  const onTap = (event: MouseEvent) => {
+    if (event.timeStamp - lastTap.current < DOUBLE_TAP_MS) {
+      lastTap.current = 0;
+      draw();
+    } else {
+      lastTap.current = event.timeStamp;
+    }
+  };
+
   return (
-    <section
-      aria-label="Result"
-      className="px-safe flex min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-3"
-    >
+    <section aria-label="Result" className="relative flex min-h-0 flex-1 flex-col">
       <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </p>
-      <div className="m-auto flex max-w-full flex-col items-center">
-        {result ? <Result key={result.id} result={result} /> : <Placeholder />}
+      {result && <CopyBadge result={result} />}
+      {/* Double-tap is a pointer shortcut; the Draw button is the keyboard equivalent. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div
+        onClick={onTap}
+        className="px-safe flex min-h-0 flex-1 select-none overflow-y-auto overflow-x-hidden py-3"
+      >
+        <div className="m-auto flex max-w-full flex-col items-center gap-4">
+          {result ? <Result key={result.id} result={result} /> : <Placeholder />}
+          {result && <p className="text-xs font-medium text-muted">Double-tap to draw again</p>}
+        </div>
       </div>
     </section>
   );

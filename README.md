@@ -11,8 +11,9 @@ https://draw.sabrlabs.co.uk). Installable, works offline, no backend, no analyti
 
 - Min/max (negatives allowed), 1–100 numbers per draw, optional unique values
 - Output as a list of tiles, a summed total, or digits joined into one code
-- One-tap presets (1–6, 1–10, 1–20, 1–100, two 1–6 summed, coin flip, lottery) plus your own
-- Shuffle animation (skipped under `prefers-reduced-motion`), haptics, tap-to-copy
+- One-tap presets (1–6, 1–10, 1–20, 1–100, two 1–6 summed, coin flip) plus your own
+- Shuffle animation (skipped under `prefers-reduced-motion`) and haptics
+- Double-tap the result to draw again; a small corner badge copies it
 - Last 50 draws kept in a collapsible history
 - Dark and light themes; follows the system on first load
 - Settings, presets and history persist in `localStorage`, and the app still works without it

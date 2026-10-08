@@ -22,7 +22,6 @@ export const BUILT_IN_PRESETS: readonly Preset[] = [
   preset('d100', '1–100', { max: 100 }),
   preset('2d6', 'Two 1–6 (sum)', { max: 6, count: 2, mode: 'sum' }),
   preset('coin', 'Coin flip', { max: 2, display: 'coin' }),
-  preset('lottery', 'Lottery', { max: 59, count: 6, allowRepeats: false, sort: true }),
 ];
 
 /** Parses untrusted (stored) custom presets, dropping anything malformed. */

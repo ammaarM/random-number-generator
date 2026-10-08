@@ -119,8 +119,8 @@ describe('formatting', () => {
 
 describe('parsing stored data', () => {
   it('round-trips a valid config through JSON', () => {
-    const lottery = BUILT_IN_PRESETS.find((p) => p.name === 'Lottery')!.config;
-    expect(parseConfig(JSON.parse(JSON.stringify(lottery)))).toEqual(lottery);
+    const unique = config({ max: 59, count: 6, allowRepeats: false, sort: true });
+    expect(parseConfig(JSON.parse(JSON.stringify(unique)))).toEqual(unique);
   });
 
   it('rejects malformed or invalid configs', () => {

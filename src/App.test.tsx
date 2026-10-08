@@ -41,14 +41,36 @@ describe('drawing', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: 'Lottery' }));
+    await user.click(screen.getByRole('button', { name: '1–20' }));
+    expect(summary()).toBe('1 number · 1–20');
+    expect(screen.getByRole('button', { name: '1–20' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByRole('button', { name: 'Lottery' })).not.toBeInTheDocument();
+  });
+
+  it('draws unique, sorted values when configured', async () => {
+    const user = userEvent.setup();
+    useStore.getState().updateConfig({ max: 59, count: 6, allowRepeats: false, sort: true });
+    render(<App />);
     expect(summary()).toBe('6 numbers · 1–59 · unique · sorted');
-    expect(screen.getByRole('button', { name: 'Lottery' })).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(screen.getByRole('button', { name: 'Draw' }));
     const { values } = useStore.getState().result!;
     expect(new Set(values).size).toBe(6);
     expect(values).toEqual([...values].sort((a, b) => a - b));
+  });
+
+  it('draws again when the result is double-tapped', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'Draw' }));
+    const first = useStore.getState().result!;
+
+    await user.click(screen.getByText('Double-tap to draw again'));
+    expect(useStore.getState().result).toBe(first);
+
+    await user.dblClick(screen.getByText('Double-tap to draw again'));
+    expect(useStore.getState().result).not.toBe(first);
+    expect(useStore.getState().history).toHaveLength(2);
   });
 
   it('shows the total and the individual values in sum mode', async () => {
@@ -59,7 +81,7 @@ describe('drawing', () => {
     await user.click(screen.getByRole('button', { name: 'Draw' }));
 
     const [a, b] = useStore.getState().result!.values;
-    expect(screen.getByRole('button', { name: `Copy total ${a + b}` })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `Copy ${a + b}` })).toBeInTheDocument();
     expect(screen.getByText(`${a} + ${b}`)).toBeInTheDocument();
     expect(liveRegion()).toHaveTextContent(`Total ${a + b}. Values: ${a}, ${b}`);
   });
@@ -74,7 +96,7 @@ describe('drawing', () => {
     expect(liveRegion()).toHaveTextContent(/Result: (Heads|Tails)/);
   });
 
-  it('copies a tapped result and confirms with a toast', async () => {
+  it('copies the result from the corner badge and confirms with a toast', async () => {
     const user = userEvent.setup();
     const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
     render(<App />);
@@ -84,6 +106,8 @@ describe('drawing', () => {
     await user.click(screen.getByRole('button', { name: `Copy ${value}` }));
 
     expect(writeText).toHaveBeenCalledWith(value);
+    // Tapping the badge copies only; it must not count towards a double-tap redraw.
+    expect(useStore.getState().history).toHaveLength(1);
     expect(await screen.findByText(`Copied ${value}`)).toBeInTheDocument();
   });
 
