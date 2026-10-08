@@ -38,10 +38,14 @@ jobs:
       - name: Test
         run: npm test
 
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      # base_path is empty on a custom domain and "/<repo>" on <user>.github.io.
       - name: Build
         run: npm run build
-
-      - uses: actions/configure-pages@v5
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
       - uses: actions/upload-pages-artifact@v4
         with:

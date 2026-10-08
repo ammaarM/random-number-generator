@@ -4,7 +4,8 @@ A mobile-first random number generator for game night: board games, tabletop ses
 games, raffles and picking turn order. Set up how numbers are generated, then tap one big button
 as often as you like.
 
-Live at **https://draw.sabrlabs.co.uk**. Installable, works offline, no backend, no analytics.
+Live at **https://ammaarm.github.io/random-number-generator/** (moving to
+https://draw.sabrlabs.co.uk). Installable, works offline, no backend, no analytics.
 
 ## Features
 
@@ -65,12 +66,14 @@ Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy
 
 1. installs with `npm ci`
 2. runs lint, type-check and tests (any failure stops the deploy)
-3. builds to `dist/`
+3. asks GitHub Pages for the site's base path and builds to `dist/`
 4. publishes `dist/` to GitHub Pages
 
-The site is served from a custom domain, so Vite's `base` is `/`. `public/CNAME` carries the
-domain into every build, and `dist/404.html` is a copy of `index.html` so deep links keep working
-if routing is added later.
+Vite's `base` defaults to `/`, which is what the custom domain needs. The workflow passes the
+path GitHub Pages reports as `BASE_PATH`, so until the custom domain is set the same build works at
+`https://<github-username>.github.io/random-number-generator/`; once it is set, the path becomes
+`/` with no code change. `dist/404.html` is a copy of `index.html` so deep links keep working if
+routing is added later.
 
 ## Custom domain setup
 

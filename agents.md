@@ -5,7 +5,7 @@ Conventions for anyone (human or agent) working in this repo.
 ## What this is
 
 **Draw**: a client-only, installable random number generator for games. No backend, no analytics,
-no trackers. Deployed to GitHub Pages at `draw.sabrlabs.co.uk`.
+no trackers. Deployed to GitHub Pages (custom domain `draw.sabrlabs.co.uk`, pending DNS).
 
 ## Stack
 
@@ -77,5 +77,7 @@ Tests sit next to the code they cover (`*.test.ts`, `*.test.tsx`).
   `prefers-reduced-motion` (`useRoll` and `MotionConfig` handle this).
 - **Layout:** design at 360–430px first. Use the `px-safe`, `pt-safe`, `pb-safe` utilities for
   safe-area insets.
-- **Deployment:** Vite `base` stays `/` and `public/CNAME` stays `draw.sabrlabs.co.uk`.
+- **Deployment:** Vite `base` defaults to `/` and is overridden only by the `BASE_PATH` env var the
+  deploy workflow sets from GitHub Pages. Never hard-code absolute `/…` URLs in `src/`; they break
+  on the `github.io/<repo>/` path. `public/CNAME` stays `draw.sabrlabs.co.uk`.
 - **Commits:** do not commit `dist/`. Generated PNG icons are committed.

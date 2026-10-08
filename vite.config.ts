@@ -2,9 +2,12 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
+// '/' for the custom domain (draw.sabrlabs.co.uk). The deploy workflow passes the path GitHub
+// Pages reports, so the same build also works at <user>.github.io/<repo>/ before the domain is set.
+const base = `${(process.env.BASE_PATH ?? '').replace(/\/+$/, '')}/`;
+
 export default defineConfig({
-  // Served from a custom domain (draw.sabrlabs.co.uk), so the site lives at the root.
-  base: '/',
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -15,8 +18,8 @@ export default defineConfig({
         short_name: 'Draw',
         description: 'A fast, fair random number generator for game night.',
         lang: 'en',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         display: 'standalone',
         orientation: 'portrait',
         theme_color: '#0c0b16',
