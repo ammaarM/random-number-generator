@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Draw — random numbers for game night</title>
+    <meta
+      name="description"
+      content="Draw is a fast, fair random number generator for board games, tabletop sessions, raffles and picking turn order. Works offline."
+    />
+    <meta name="theme-color" content="#0c0b16" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Draw" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <script>
+      // Apply the theme before first paint to avoid a flash. Mirrors src/store.ts.
+      (function () {
+        var theme = null;
+        try {
+          theme = JSON.parse(localStorage.getItem('draw:theme'));
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+        }
+        var root = document.documentElement;
+        root.classList.toggle('dark', theme === 'dark');
+        root.classList.toggle('light', theme === 'light');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>Draw needs JavaScript to generate random numbers.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

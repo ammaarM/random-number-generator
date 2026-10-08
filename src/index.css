@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --bg: 12 11 22;
+    --surface: 23 22 39;
+    --surface-2: 34 32 56;
+    --border: 58 55 92;
+    --text: 243 242 255;
+    --muted: 170 167 198;
+    --accent: 109 74 255;
+    --accent-deep: 78 46 224;
+    --accent-text: 180 165 255;
+    --on-accent: 255 255 255;
+    --danger: 255 128 144;
+  }
+
+  :root.light {
+    color-scheme: light;
+    --bg: 245 244 251;
+    --surface: 255 255 255;
+    --surface-2: 236 234 247;
+    --border: 205 201 228;
+    --text: 20 19 43;
+    --muted: 86 84 112;
+    --accent: 98 66 245;
+    --accent-deep: 74 43 214;
+    --accent-text: 84 51 230;
+    --on-accent: 255 255 255;
+    --danger: 186 28 58;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg font-sans text-text antialiased;
+    background-image:
+      radial-gradient(60rem 28rem at 50% -8rem, rgb(var(--accent) / 0.2), transparent 70%),
+      radial-gradient(40rem 20rem at 50% 110%, rgb(var(--accent) / 0.12), transparent 70%);
+    background-attachment: fixed;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  [role='switch'],
+  label {
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-text));
+    outline-offset: 2px;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .pt-safe {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
